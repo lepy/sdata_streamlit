@@ -58,19 +58,32 @@ sdatapart = st.sidebar.radio(
 
 if sdatapart == 'Metadata':
     st.markdown('## Metadata')
+    input_name = st.text_input("name", value=data.name)
+    if input_name:
+        data.name = input_name
+        # st.info("changed name to {}".format(data.name))
+
     gen_uuid = st.button("gen uuid")
     if gen_uuid:
         new_uuid = uuid.uuid4()
         data.uuid = new_uuid
-    # content_metadata = get_content("metadata")
+    input_uuid = st.text_input("uuid", value=data.uuid)
+    if input_uuid:
+        data.uuid = input_uuid
+    # st.markdown("{}".format(data.name))
+    # st.markdown("{}".format(data.uuid))
+
+
+    st.markdown("""### Edit Metadata [name; value; dtype; unit; description]""")
     content_metadata = data.metadata.to_csv(sep=";", header=None)
+    content_metadata = content_metadata.replace("\t", " ; ")
 
-    content_metadata = content_metadata.replace("\t", ";")
+    # content_metadata = st_ace(key="Meta", height=100, placeholder=content_metadata, value=content_metadata,
+    #                           language="rst")
 
-    st.write("name; value; dtype; unit; description")
-    content_metadata = st_ace(key="Meta", height=100, placeholder=content_metadata, value=content_metadata,
-                              language="rst")
-    content_metadata = content_metadata.replace("\t", ";")
+    content_metadata = st.text_area("metadata", value=content_metadata, height=200, max_chars=None, key="metadata")
+
+    content_metadata = content_metadata.replace("\t", " ; ")
     # st.write(content_metadata)
     cells = []
     for line in content_metadata.splitlines():
@@ -83,13 +96,15 @@ if sdatapart == 'Metadata':
         for i, row in df.iterrows():
             # print(row)
             # print(row["name"], row.value, str(row.dtype), row.unit, row.description)
-            data.metadata.add(row["name"], value=row["value"], dtype=str(row["dtype"]), unit=row["unit"],
+            # print([row["name"]])
+            if row["name"]:
+                data.metadata.add(row["name"], value=row["value"], dtype=str(row["dtype"]), unit=row["unit"],
                               description=row["description"])
 
     except Exception as exp:
         st.markdown("### error: {}".format(exp))
         st.write(cells)
-    st.write("sdata.Data.metadata")
+    st.markdown("### sdata.Data.metadata.df")
     st.dataframe(data.metadata.df)
 
 elif sdatapart == 'Table':
@@ -97,12 +112,14 @@ elif sdatapart == 'Table':
     # content_table = get_content("table")
     content_table = data.df.to_csv(sep=";", index=None)
     content_table = content_table.replace("\t", ";")
-    content_table = st_ace(key="table", height=100, placeholder=content_table, value=content_table)
+    content_table = st.text_area("table", value=content_table, height=200, max_chars=None, key="table")
+    # content_table = st_ace(key="table", height=100, placeholder=content_table, value=content_table)
     content_table = content_table.replace("\t", ";")
     cells = []
     for line in content_table.splitlines():
         row = []
         for cell in line.split(";"):
+            cell = cell.strip()
             try:
                 cell = float(cell.replace(",", "."))
             except:
@@ -137,7 +154,7 @@ else:
 
 st.sidebar.markdown("## sdata.Data Status")
 st.sidebar.markdown("{}".format(data.name))
-st.sidebar.markdown("{}".format(data.uuid))
+# st.sidebar.markdown("{}".format(data.uuid))
 st.sidebar.dataframe(data.describe())
 
 ex = st.button("export data")
