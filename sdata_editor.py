@@ -12,23 +12,109 @@ layout="wide",
 initial_sidebar_state="expanded",
 )
 
-st.markdown("# sdata example")
+st.markdown("# sdata")
 
-st.sidebar.markdown("## sdata")
+st.sidebar.markdown("## sdata demo app")
 
 
 def basic_example():
     df = pd.DataFrame({"a": [1.1, 2.1, 3.5],
                        "b": [2.4, 1.2, 2.2]})
     d = sdata.Data(name="basic example", uuid="38b26864e7794f5182d38459bab85842", table=df)
-    d.metadata.add("Temp", value=25.4, dtype="float", unit="degC", description="Temperatur")
-    d.comment = """# header
+    d.metadata.add("Temperatur", value=25.4, dtype="float", unit="degC", description="Temperatur")
+    d.comment = """# Ein Basisbeispiel
+
+Dieses Beispiel zeigt die Ablage einer Tabelle mit zwei Spalten im sdata-Format. 
+
+Das sdata-Datenformat besteht aus drei Komponenten: den Daten (hier eine **Tabelle** `table`), den **Metadaten** `metadata` 
+(`name`, `uuid`, `Temperatur`) und einer **Beschreibung** der Daten `comment`.
+
+Jeder Datensatz benötigt einen Namen `name`. Die vom User vorgegebene Identifikation des Datensatzes ist aber mit einer hohen 
+Wahrscheinlichkeit nicht eindeutig, da i.d.R sehr kurze Bezeichnungen gewählt werden. 
+ 
+Zur Identifikation eines Datensatzes ist eine möglichst eindeutige Bezeichnung hilfreich. Üblicherweise wird hierzu  
+ein sogenannter Universally Unique Identifier [`uuid`](https://de.wikipedia.org/wiki/Universally_Unique_Identifier) 
+verwendet. Diese Merkmale eines Datensatzes werden im sdata-Format in den Metadaten gespeichert.
+
+Die Komponente `metadata` hat also mindestenz zwei Attribute `name` und `uuid`. Die einfachste Form eines Attributes 
+stellt ein key-value-Tupel dar, d.h. eine Verknüpfung einer Bedeutung mit einer Ausprägung, z.B. `Augenfarbe="blau"` 
+oder `name="basic example"`.
+
+Ein Attribut - auch Eigenschaft genannt - stellt demnach ein Merkmal des Datenobjektes dar. Nützlich ist auch eine 
+Angabe einer physikalischen Größe, welche i.d.R. Einheiten behaftet ist. Exemplarisch ist hier ein Attribut 
+`Temperatur` mit der Ausprägung `25.4°C` aufgeführt. Die physikalische Einheit wird im Attributfeld `unit` abgelegt 
+(`unit="degC"`) und der Zahlenwert im Feld `value=25.4`. Da eine physikalische Größe aus dem Produkt einer (reelen) Zahl und 
+einer physikalischen Einheit besteht, sieht das sdata-Attribut-Format auch ein Attributfeld `dtype` 
+zur Definition des Datentypes für den Attributwert `value` vor.
+
+Ferner kann jedes Attribut im Feld `description` genauer beschrieben werden.
+ 
+Ein `Attribut` (Eigenschaft) des Datenobjektes hat im sdata-Format hat demnach die Felder
+
+* `name` ... Name des Attributes
+* `value` ... Wert des Attributes
+* `dtype` ... Datentyp des Attributwertes `values` (default=`str`)
+* `unit` ... physikalische Einheit des Attributes (*optional*)
+* `description` ... Beschreibung des Attributes (*optional*)
+
+Die Beschreibung `description` ist vom Typ `str`, d.h. es ist u.a. Möglich eine vereinfachte Auszeichnungssprache 
+wie [Markdown](https://de.wikipedia.org/wiki/Markdown) zu vewenden.
+
+Beispielhaft ist hier Datenbeschreibung mit Überschriften und Formel aufgeführt.   
+
+    # header
     ## subheader
 
     a remarkable text
+    
+    Bullet list:
+    
+    - aaa
+        - aaa.b
+    - bbb
+    
+    
+    Numbered list:
+    
+    1. foo
+    1. bar
 
     $f(x) = \\frac{1}{2}\\sin(x)$
+    
+    code:
+    
+        name="basic example"
+
+    A [Link](https://github.com/lepy/sdata).
+
+# header
+## subheader
+
+a remarkable text
+
+Bullet list:
+
+- aaa
+    - aaa.b
+- bbb
+
+
+Numbered list:
+
+1. foo
+1. bar
+
+$f(x) = \\frac{1}{2}\\sin(x)$
+
+code:
+
+    name="basic example"
+
+A [Link](https://github.com/lepy/sdata).
+
     """
+
+
     return d
 
 def minimal_example():
@@ -43,7 +129,7 @@ examples = {"basic example": basic_example,
 select_example = st.sidebar.selectbox("Example", list(examples.keys()), index=0, key=None)
 
 
-@st.cache(persist=False, allow_output_mutation=True)
+# @st.cache(persist=False, allow_output_mutation=True)
 def get_sdata(name):
     d = examples.get(name, "basic example")()
     return d
