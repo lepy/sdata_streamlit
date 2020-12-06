@@ -80,6 +80,7 @@ elif sdatapart == METADATA:
     input_uuid = st.text_input("uuid", value=data.uuid)
     if input_uuid:
         data.uuid = input_uuid
+        # todo: textarea update
     # st.markdown("{}".format(data.name))
     # st.markdown("{}".format(data.uuid))
 
