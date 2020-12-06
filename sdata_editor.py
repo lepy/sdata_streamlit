@@ -5,6 +5,14 @@ import numpy as np
 import sdata
 import uuid
 
+st.set_page_config(
+page_title="sdata demo app",
+page_icon="!",
+layout="wide",
+initial_sidebar_state="expanded",
+)
+
+
 st.markdown("# sdata example")
 st.sidebar.markdown("## sdata")
 
@@ -25,7 +33,6 @@ a remarkable text
 $f(x) = \\frac{1}{2}\\sin(x)$
 
 
-[SCALE](https://www.scale.eu/)
 """
     return d
 
@@ -146,8 +153,10 @@ print(data.comment)
                           language="python", wrap=True)
     st.balloons()
 
-st.sidebar.markdown("""* [SCALE](https://www.scale.eu/de/dienst/fem-methoden)
+st.sidebar.markdown("""
 * [sdata.git](https://github.com/lepy/sdata)
 * [sdata.doc](https://sdata.readthedocs.io/en/latest/index.html)
 
 """)
+
+st.markdown(data.get_download_link(), unsafe_allow_html=True)
