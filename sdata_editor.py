@@ -171,5 +171,3 @@ st.sidebar.markdown("""© Lepy 2017-2020
 # * © [sdata demo app GPL license](https://raw.githubusercontent.com/lepy/sdata_streamlit/main/LICENSE)
 
 st.markdown(data.get_download_link(), unsafe_allow_html=True)
-st.write(data.df.dtypes)
-st.write(data.df.iloc[0].dtype)
