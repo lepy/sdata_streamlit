@@ -101,7 +101,15 @@ elif sdatapart == 'Table':
     content_table = content_table.replace("\t", ";")
     cells = []
     for line in content_table.splitlines():
-        cells.append(line.split(";"))
+        row = []
+        for cell in line.split(";"):
+            try:
+                cell = float(cell.replace(",", "."))
+            except:
+                pass
+            row.append(cell)
+        # cells.append(line.split(";"))
+        cells.append(row)
     try:
         df = pd.DataFrame(cells[1:], columns=cells[0])
         # st.write("parsed data")
@@ -153,10 +161,15 @@ print(data.comment)
                           language="python", wrap=True)
     st.balloons()
 
-st.sidebar.markdown("""
-* [sdata.git](https://github.com/lepy/sdata)
-* [sdata.doc](https://sdata.readthedocs.io/en/latest/index.html)
+st.sidebar.markdown("""© Lepy 2017-2020
 
+* [sdata.git](https://github.com/lepy/sdata)
+* [sdata MIT license](https://raw.githubusercontent.com/lepy/sdata/master/LICENSE-MIT)
+* [sdata documentation](https://sdata.readthedocs.io/en/latest/index.html)
 """)
 
+# * © [sdata demo app GPL license](https://raw.githubusercontent.com/lepy/sdata_streamlit/main/LICENSE)
+
 st.markdown(data.get_download_link(), unsafe_allow_html=True)
+st.write(data.df.dtypes)
+st.write(data.df.iloc[0].dtype)
