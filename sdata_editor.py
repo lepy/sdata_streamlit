@@ -12,51 +12,61 @@ layout="wide",
 initial_sidebar_state="expanded",
 )
 
-
 st.markdown("# sdata example")
+
 st.sidebar.markdown("## sdata")
+
+
+def basic_example():
+    df = pd.DataFrame({"a": [1.1, 2.1, 3.5],
+                       "b": [2.4, 1.2, 2.2]})
+    d = sdata.Data(name="basic example", uuid="38b26864e7794f5182d38459bab85842", table=df)
+    d.metadata.add("Temp", value=25.4, dtype="float", unit="degC", description="Temperatur")
+    d.comment = """# header
+    ## subheader
+
+    a remarkable text
+
+    $f(x) = \\frac{1}{2}\\sin(x)$
+    """
+    return d
+
+def minimal_example():
+    d = sdata.Data(name="Die Antwort",
+                      table=pd.DataFrame({"x": [42]}),
+                      comment="The Answer to the Ultimate Question of Life, The Universe, and Everything")
+    return d
+
+examples = {"basic example": basic_example,
+            "minimal example": minimal_example}
+
+select_example = st.sidebar.selectbox("Example", list(examples.keys()), index=0, key=None)
 
 
 @st.cache(persist=False, allow_output_mutation=True)
 def get_sdata(name):
-    df = pd.DataFrame({"a": [1.1, 2.1, 3.5],
-                       "b": [2.4, 1.2, 2.2]})
-    d = sdata.Data(name=name, uuid="38b26864e7794f5182d38459bab85842", table=df)
-    d.metadata.add("Temp", value=25.4, dtype="float", unit="degC", description="Temperatur")
-    d.comment = """# header
-## subheader
-
-a remarkable text
-
-
-
-$f(x) = \\frac{1}{2}\\sin(x)$
-
-
-"""
+    d = examples.get(name, "basic example")()
     return d
 
-# print(help(st_ace))
-# Spawn a new Ace editor
-# st_ace(value='', placeholder='', height=500, language='plain_text', theme='chrome',
-# keybinding='vscode', min_lines=None, max_lines=None, font_size=12,
-# tab_size=4, wrap=False, show_gutter=True, show_print_margin=False,
-# readonly=False, annotations=None, markers=None, auto_update=True, key=None)
-
-data = get_sdata("my_first_sdata")
-
-
+data = get_sdata(select_example)
 
 content_metadata = data.metadata.to_csv(sep=";", header=None)
-
+EXAMPLE_DESCRIPTION = 'Example description'
+METADATA = "Metadata"
+TABLE = "Table"
+COMMENT = "Comment"
+EXPORT = 'Export'
 
 sdatapart = st.sidebar.radio(
     "choose sdata.Data component:",
-    ('Metadata', 'Table', 'Comment'))
+    (EXAMPLE_DESCRIPTION, METADATA, TABLE, COMMENT, EXPORT))
 
 
+if sdatapart == EXAMPLE_DESCRIPTION:
+    st.markdown(data.comment)
 
-if sdatapart == 'Metadata':
+# ------------------------- Metadata ----------------------------------------
+elif sdatapart == METADATA:
     st.markdown('## Metadata')
     input_name = st.text_input("name", value=data.name)
     if input_name:
@@ -107,7 +117,8 @@ if sdatapart == 'Metadata':
     st.markdown("### sdata.Data.metadata.df")
     st.dataframe(data.metadata.df)
 
-elif sdatapart == 'Table':
+# ------------------------- Table ----------------------------------------
+elif sdatapart == TABLE:
     st.markdown('## Table')
     # content_table = get_content("table")
     content_table = data.df.to_csv(sep=";", index=None)
@@ -138,8 +149,8 @@ elif sdatapart == 'Table':
     st.write("sdata.Data.table")
     st.dataframe(data.table)
 
-
-elif sdatapart == 'Comment':
+# ------------------------- Comment ----------------------------------------
+elif sdatapart == COMMENT:
     st.markdown('## Comment')
     content_comment = data.comment
     content_comment = st_ace(key="comment", height=100, placeholder=content_comment,
@@ -147,36 +158,55 @@ elif sdatapart == 'Comment':
     st.write(content_comment)
     data.comment = content_comment
 
+# ------------------------- Export ----------------------------------------
+elif sdatapart == EXPORT:
+    st.markdown('## Export')
+
+    st.markdown(data.get_download_link(), unsafe_allow_html=True)
+
+    ex = st.button("export data as json")
+    if ex:
+        st.markdown("## sdata.Data json")
+        content_json = data.to_json()
+        # content_json = st_ace(key="json", height=100, value=content_json, readonly=True,
+        #                       language="json", wrap=True)
+
+        st.json(content_json)
+
+        # data2 = data.from_json(data.to_json())
+        st.markdown("## example python code")
+        content_python = r"""# python example
+    import sdata
+    json_str = r'''{}'''
+    data = sdata.Data.from_json(json_str)
+    print(data.describe())
+    print(data.metadata.df)
+    print(data.df)
+    print(data.comment)
+    """.format(data.to_json())
+
+        # st.code(content_python, language='python')
+        content_json = st_ace(key="python", height=200, value=content_python, readonly=True,
+                              language="python", wrap=True)
+        st.balloons()
+
 else:
     st.write("You didn't select anything.")
-
-
 
 st.sidebar.markdown("## sdata.Data Status")
 st.sidebar.markdown("{}".format(data.name))
 # st.sidebar.markdown("{}".format(data.uuid))
 st.sidebar.dataframe(data.describe())
 
-ex = st.button("export data")
-if ex:
-    st.markdown("## sdata.Data json")
-    content_json = st_ace(key="json", height=100, value=data.to_json(), readonly=True,
-                          language="json", wrap=True)
 
-    # data2 = data.from_json(data.to_json())
-    st.markdown("## example python code")
-    content_python = r"""# python example
-import sdata
-json_str = r'''{}'''
-data = sdata.Data.from_json(json_str)
-print(data.describe())
-print(data.metadata.df)
-print(data.df)
-print(data.comment)
-""".format(data.to_json())
-    content_json = st_ace(key="python", height=200, value=content_python, readonly=True,
-                          language="python", wrap=True)
-    st.balloons()
+# chart_data = pd.DataFrame(
+#     np.random.randn(20, 3),
+#     columns=['a', 'b', 'c'])
+# button_plot = st.button("plot data")
+# if button_plot:
+#     chart_data = data.df
+#     st.line_chart(chart_data)
+
 
 st.sidebar.markdown("""© Lepy 2017-2020
 
@@ -187,4 +217,3 @@ st.sidebar.markdown("""© Lepy 2017-2020
 
 # * © [sdata demo app GPL license](https://raw.githubusercontent.com/lepy/sdata_streamlit/main/LICENSE)
 
-st.markdown(data.get_download_link(), unsafe_allow_html=True)
