@@ -312,12 +312,12 @@ elif sdatapart == EXPORT:
 
     ex = st.button("export data as json")
     if ex:
-        st.markdown("## sdata.Data json")
+        # st.markdown("## sdata.Data json")
         content_json = data.to_json()
         # content_json = st_ace(key="json", height=100, value=content_json, readonly=True,
         #                       language="json", wrap=True)
 
-        st.json(content_json)
+        # st.json(content_json)
 
         # data2 = data.from_json(data.to_json())
         st.markdown("## example python code")
