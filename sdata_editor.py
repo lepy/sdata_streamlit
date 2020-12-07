@@ -1,3 +1,4 @@
+# -*-coding: utf-8-*-
 import streamlit as st
 from streamlit_ace import st_ace
 import pandas as pd
@@ -7,7 +8,7 @@ import uuid
 
 st.set_page_config(
 page_title="sdata demo app",
-page_icon="!",
+page_icon="🔖",
 layout="wide",
 initial_sidebar_state="expanded",
 )
@@ -16,6 +17,9 @@ st.markdown("# sdata")
 
 st.sidebar.markdown("## sdata demo app")
 
+def empty():
+    d = sdata.Data(name="N.N", table=pd.DataFrame(columns=[0]), comment="This is an empty Data objekt. It has only a `name`, a `uuid` and this `comment`.")
+    return d
 
 def basic_example():
     df = pd.DataFrame({"a": [1.1, 2.1, 3.5],
@@ -26,10 +30,10 @@ def basic_example():
 
 Dieses Beispiel zeigt die Ablage einer Tabelle mit zwei Spalten im sdata-Format. 
 
-Das sdata-Datenformat besteht aus drei Komponenten: den Daten (hier eine **Tabelle** `table`), den **Metadaten** `metadata` 
+Das sdata-Datenformat `Data` besteht aus drei Komponenten: den Daten (hier eine **Tabelle** `table`), den **Metadaten** `metadata` 
 (`name`, `uuid`, `Temperatur`) und einer **Beschreibung** der Daten `comment`.
 
-Jeder Datensatz benötigt einen Namen `name`. Die vom User vorgegebene Identifikation des Datensatzes ist aber mit einer hohen 
+Jeder Datensatz `Data` benötigt einen Namen `name`. Die vom User vorgegebene Identifikation des Datensatzes ist aber mit einer hohen 
 Wahrscheinlichkeit nicht eindeutig, da i.d.R sehr kurze Bezeichnungen gewählt werden. 
  
 Zur Identifikation eines Datensatzes ist eine möglichst eindeutige Bezeichnung hilfreich. Üblicherweise wird hierzu  
@@ -124,12 +128,13 @@ def minimal_example():
     return d
 
 examples = {"basic example": basic_example,
-            "minimal example": minimal_example}
+            "minimal example": minimal_example,
+            "empty":empty}
 
 select_example = st.sidebar.selectbox("Example", list(examples.keys()), index=0, key=None)
 
 
-# @st.cache(persist=False, allow_output_mutation=True)
+@st.cache(persist=False, allow_output_mutation=True)
 def get_sdata(name):
     d = examples.get(name, "basic example")()
     return d
@@ -226,7 +231,10 @@ elif sdatapart == TABLE:
         # cells.append(line.split(";"))
         cells.append(row)
     try:
+        print(cells[1:10])
         df = pd.DataFrame(cells[1:], columns=cells[0])
+        # df.dropna(inplace=True)
+        print(df.head())
         # st.write("parsed data")
         # st.dataframe(df)
         data.df = df
