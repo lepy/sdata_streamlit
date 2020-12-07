@@ -18,24 +18,20 @@ st.markdown("# sdata")
 st.sidebar.markdown("## sdata demo app")
 
 def empty():
-    d = sdata.Data(name="N.N", table=pd.DataFrame(columns=[0]), comment="This is an empty Data objekt. It has only a `name`, a `uuid` and this `comment`.")
+    d = sdata.Data(name="N.N", table=pd.DataFrame(columns=[0]), description="This is an empty Data objekt. It has only a `name`, a `uuid` and this `description`.")
     return d
 
 def basic_example():
-    df = pd.DataFrame({"a": [1.1, 2.1, 3.5],
-                       "b": [2.4, 1.2, 2.2]})
-    d = sdata.Data(name="basic example", uuid="38b26864e7794f5182d38459bab85842", table=df)
-    d.metadata.add("Temperatur", value=25.4, dtype="float", unit="degC", description="Temperatur")
-    d.comment = """# Ein Basisbeispiel
+    description = """# Ein Basisbeispiel
 
 Dieses Beispiel zeigt die Ablage einer Tabelle mit zwei Spalten im sdata-Format. 
 
 Das sdata-Datenformat `Data` besteht aus drei Komponenten: den Daten (hier eine **Tabelle** `table`), den **Metadaten** `metadata` 
-(`name`, `uuid`, `Temperatur`) und einer **Beschreibung** der Daten `comment`.
+(`name`, `uuid`, `Temperatur`) und einer **Beschreibung** der Daten `description`.
 
 Jeder Datensatz `Data` benötigt einen Namen `name`. Die vom User vorgegebene Identifikation des Datensatzes ist aber mit einer hohen 
 Wahrscheinlichkeit nicht eindeutig, da i.d.R sehr kurze Bezeichnungen gewählt werden. 
- 
+
 Zur Identifikation eines Datensatzes ist eine möglichst eindeutige Bezeichnung hilfreich. Üblicherweise wird hierzu  
 ein sogenannter Universally Unique Identifier [`uuid`](https://de.wikipedia.org/wiki/Universally_Unique_Identifier) 
 verwendet. Diese Merkmale eines Datensatzes werden im sdata-Format in den Metadaten gespeichert.
@@ -52,7 +48,7 @@ einer physikalischen Einheit besteht, sieht das sdata-Attribut-Format auch ein A
 zur Definition des Datentypes für den Attributwert `value` vor.
 
 Ferner kann jedes Attribut im Feld `description` genauer beschrieben werden.
- 
+
 Ein `Attribut` (Eigenschaft) des Datenobjektes hat im sdata-Format hat demnach die Felder
 
 * `name` ... Name des Attributes
@@ -60,6 +56,16 @@ Ein `Attribut` (Eigenschaft) des Datenobjektes hat im sdata-Format hat demnach d
 * `dtype` ... Datentyp des Attributwertes `values` (default=`str`)
 * `unit` ... physikalische Einheit des Attributes (*optional*)
 * `description` ... Beschreibung des Attributes (*optional*)
+
+Das eigentliche Datenobjekt `table` ist als `pandas.DataFrame` repräsentiert, d.h. jede Zelle der Tabelle ist durch 
+ein Tupel (index, column) indiziert. Jede Spalte (`column`) ist durch den Spaltennamen (hier z.B. `a` oder `b`) indizierbar. 
+Jede Zeile (`row`) ist durch den `index` indiziert, wobei der `index` auch alphanumerisch sein kann (z.B. 'max_b').
+
+             a    b
+    index          
+    0      1.1  2.4
+    max_b  2.1  5.2
+    2      3.5  2.2
 
 Die Beschreibung `description` ist vom Typ `str`, d.h. es ist u.a. Möglich eine vereinfachte Auszeichnungssprache 
 wie [Markdown](https://de.wikipedia.org/wiki/Markdown) zu vewenden.
@@ -70,23 +76,23 @@ Beispielhaft ist hier Datenbeschreibung mit Überschriften und Formel aufgeführ
     ## subheader
 
     a remarkable text
-    
+
     Bullet list:
-    
+
     - aaa
         - aaa.b
     - bbb
-    
-    
+
+
     Numbered list:
-    
+
     1. foo
     1. bar
 
     $f(x) = \\frac{1}{2}\\sin(x)$
-    
+
     code:
-    
+
         name="basic example"
 
     A [Link](https://github.com/lepy/sdata).
@@ -116,15 +122,18 @@ code:
 
 A [Link](https://github.com/lepy/sdata).
 
-    """
+        """
 
-
+    df = pd.DataFrame({"a": [1.1, 2.1, 3.5],
+                       "b": [2.4, 5.2, 2.2]}, index=[0, 'max_b', 2])
+    d = sdata.Data(name="basic example", uuid="38b26864e7794f5182d38459bab85842", table=df, description=description)
+    d.metadata.add("Temperatur", value=25.4, dtype="float", unit="degC", description="Temperatur")
     return d
 
 def minimal_example():
     d = sdata.Data(name="Die Antwort",
                       table=pd.DataFrame({"x": [42]}),
-                      comment="The Answer to the Ultimate Question of Life, The Universe, and Everything")
+                      description="The Answer to the Ultimate Question of Life, The Universe, and Everything")
     return d
 
 examples = {"basic example": basic_example,
@@ -145,16 +154,16 @@ content_metadata = data.metadata.to_csv(sep=";", header=None)
 EXAMPLE_DESCRIPTION = 'Example description'
 METADATA = "Metadata"
 TABLE = "Table"
-COMMENT = "Comment"
+DESCRIPTION = "Description"
 EXPORT = 'Export'
 
 sdatapart = st.sidebar.radio(
     "choose sdata.Data component:",
-    (EXAMPLE_DESCRIPTION, METADATA, TABLE, COMMENT, EXPORT))
+    (EXAMPLE_DESCRIPTION, METADATA, TABLE, DESCRIPTION, EXPORT))
 
 
 if sdatapart == EXAMPLE_DESCRIPTION:
-    st.markdown(data.comment)
+    st.markdown(data.description)
 
 # ------------------------- Metadata ----------------------------------------
 elif sdatapart == METADATA:
@@ -244,14 +253,14 @@ elif sdatapart == TABLE:
     st.write("sdata.Data.table")
     st.dataframe(data.table)
 
-# ------------------------- Comment ----------------------------------------
-elif sdatapart == COMMENT:
-    st.markdown('## Comment')
-    content_comment = data.comment
-    content_comment = st_ace(key="comment", height=100, placeholder=content_comment,
-                             language="markdown", value=content_comment)
-    st.write(content_comment)
-    data.comment = content_comment
+# ------------------------- Description ----------------------------------------
+elif sdatapart == DESCRIPTION:
+    st.markdown('## Description')
+    content_description = data.description
+    content_description = st_ace(key="description", height=100, placeholder=content_description,
+                             language="markdown", value=content_description)
+    st.write(content_description)
+    data.description = content_description
 
 # ------------------------- Export ----------------------------------------
 elif sdatapart == EXPORT:
@@ -271,18 +280,19 @@ elif sdatapart == EXPORT:
         # data2 = data.from_json(data.to_json())
         st.markdown("## example python code")
         content_python = r"""# python example
-    import sdata
-    json_str = r'''{}'''
-    data = sdata.Data.from_json(json_str)
-    print(data.describe())
-    print(data.metadata.df)
-    print(data.df)
-    print(data.comment)
-    """.format(data.to_json())
+import sdata
+json_str = r'''{}'''
+data = sdata.Data.from_json(json_str)
+print(data.describe())
+print(data.metadata.df)
+print(data.df)
+print(data.description)
+""".format(data.to_json())
 
-        # st.code(content_python, language='python')
-        content_json = st_ace(key="python", height=200, value=content_python, readonly=True,
-                              language="python", wrap=True)
+        # st.code(content_python)
+        # content_json = st_ace(key="python", height=200, value=content_python, readonly=True,
+        #                       language="python", wrap=True)
+        st.text_area("python", value=content_python, height=300)
         st.balloons()
 
 else:
