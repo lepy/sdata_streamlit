@@ -13,7 +13,7 @@ layout="wide",
 initial_sidebar_state="expanded",
 )
 
-st.markdown("# sdata")
+st.markdown("# sdata v{}".format(sdata.__version__))
 
 st.sidebar.markdown("## sdata demo app")
 
