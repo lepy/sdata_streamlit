@@ -62,7 +62,9 @@ def empty():
     return d
 
 def basic_example():
-    description = """# Ein Basisbeispiel
+    description = """Ingolf Lepenies. (2020). Das sdata-Format (Version 0.8.4). http://doi.org/10.5281/zenodo.4311323
+
+# Ein Basisbeispiel
 
 Dieses Beispiel zeigt die Ablage einer Tabelle mit zwei Spalten im sdata-Format. 
 
@@ -96,6 +98,7 @@ Ein `Attribut` (Eigenschaft) des Datenobjektes hat im sdata-Format hat demnach d
 * `dtype` ... Datentyp des Attributwertes `values` (default=`str`)
 * `unit` ... physikalische Einheit des Attributes (*optional*)
 * `description` ... Beschreibung des Attributes (*optional*)
+* `label` ... optionales Label des Attributes, z.B. für Plotzwecke 
 
 Das eigentliche Datenobjekt `table` ist als `pandas.DataFrame` repräsentiert, d.h. jede Zelle der Tabelle ist durch 
 ein Tupel (index, column) indiziert. Jede Spalte (`column`) ist durch den Spaltennamen (hier z.B. `a` oder `b`) indizierbar. 
@@ -360,6 +363,8 @@ st.sidebar.markdown("""© Lepy 2017-2020
 * [sdata.git](https://github.com/lepy/sdata)
 * [sdata MIT license](https://raw.githubusercontent.com/lepy/sdata/master/LICENSE-MIT)
 * [sdata documentation](https://sdata.readthedocs.io/en/latest/index.html)
+
+
 """)
 
 # * © [sdata demo app GPL license](https://raw.githubusercontent.com/lepy/sdata_streamlit/main/LICENSE)
