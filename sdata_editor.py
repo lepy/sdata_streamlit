@@ -232,7 +232,7 @@ elif sdatapart == METADATA:
     # st.markdown("{}".format(data.uuid))
 
 
-    st.markdown("""### Edit Metadata [name; value; dtype; unit; description]""")
+    st.markdown("""### Edit Metadata [name; value; dtype; unit; description, required]""")
     content_metadata = data.metadata.to_csv(sep=";", header=None)
     content_metadata = content_metadata.replace("\t", " ; ")
 
